@@ -1,5 +1,5 @@
 [Unit]
-Description=Включение маршрутизации OpenVPN трафика.
+Description=Enabling routing of OpenVPN traffic.
 [Service]
 ExecStart=/root/bin/vpn_route.sh
 [Install]
