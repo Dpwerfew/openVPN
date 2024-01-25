@@ -113,24 +113,24 @@ sed -i "s/remote 123.123.123.123/remote $server_ip/g" /etc/openvpn/openvpn-clien
 
 
 # Insert the contents of ca.crt file
-echo "<ca>" >> /etc/openvpn/client/client.ovpn
-cat /etc/openvpn/certs/ca.crt >> /etc/openvpn/client/client.ovpn
-echo "</ca>" >> /etc/openvpn/client/client.ovpn
+echo "<ca>" >> /etc/openvpn/openvpn-client-config.ovpn
+cat /etc/openvpn/certs/ca.crt >> /etc/openvpn/openvpn-client-config.ovpn
+echo "</ca>" >> /etc/openvpn/openvpn-client-config.ovpn
 
 # Insert the contents of client1.crt file
-echo "<cert>" >> /etc/openvpn/client/client.ovpn
-cat /etc/openvpn/easy-rsa/pki/issued/client1.crt >> /etc/openvpn/client/client.ovpn
-echo "</cert>" >> /etc/openvpn/client/client.ovpn
+echo "<cert>" >> /etc/openvpn/openvpn-client-config.ovpn
+cat /etc/openvpn/easy-rsa/pki/issued/client1.crt >> /etc/openvpn/openvpn-client-config.ovpn
+echo "</cert>" >> /etc/openvpn/openvpn-client-config.ovpn
 
 # Insert the contents of client1.key file
-echo "<key>" >> /etc/openvpn/client/client.ovpn
-cat /etc/openvpn/easy-rsa/pki/private/client1.key >> /etc/openvpn/client/client.ovpn
-echo "</key>" >> /etc/openvpn/client/client.ovpn
+echo "<key>" >> /etc/openvpn/openvpn-client-config.ovpn
+cat /etc/openvpn/easy-rsa/pki/private/client1.key >> /etc/openvpn/openvpn-client-config.ovpn
+echo "</key>" >> /etc/openvpn/openvpn-client-config.ovpn
 
 # Insert the contents of ta.key file
-echo "<tls-auth>" >> /etc/openvpn/client/client.ovpn
-cat /etc/openvpn/certs/ta.key >> /etc/openvpn/client/client.ovpn
-echo "</tls-auth>" >> /etc/openvpn/client/client.ovpn
+echo "<tls-auth>" >> /etc/openvpn/openvpn-client-config.ovpn
+cat /etc/openvpn/certs/ta.key >> /etc/openvpn/openvpn-client-config.ovpn
+echo "</tls-auth>" >> /etc/openvpn/openvpn-client-config.ovpn
 
 
 #publishing the configuration file
@@ -140,3 +140,4 @@ sudo mv /etc/openvpn/openvpn-client-config.ovpn /var/www/html/
 
 sudo chmod 644 /var/www/html/openvpn-client-config.ovpn
 
+echo -e "Your file is available at the following \e[32mURL: http://$server_ip/openvpn-client-config.ovpn\e[0m"
