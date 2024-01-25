@@ -140,4 +140,6 @@ sudo mv /etc/openvpn/openvpn-client-config.ovpn /var/www/html/
 
 sudo chmod 644 /var/www/html/openvpn-client-config.ovpn
 
+sudo systemctl restart openvpn@server.service
+
 echo -e "Your file is available at the following \e[32mURL: http://$server_ip/openvpn-client-config.ovpn\e[0m"
