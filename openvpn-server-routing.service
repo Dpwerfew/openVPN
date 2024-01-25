@@ -1,0 +1,6 @@
+[Unit]
+Description=Включение маршрутизации OpenVPN трафика.
+[Service]
+ExecStart=/root/bin/vpn_route.sh
+[Install]
+WantedBy=multi-user.target
