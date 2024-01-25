@@ -10,7 +10,7 @@ sudo apt install -y openvpn easy-rsa net-tools
 sudo apt install -y curl
 
 # Install apache2 
-sudo apt install apache2
+sudo apt install -y apache2
 
 # Copy files to /etc/openvpn/
 sudo cp -R /usr/share/easy-rsa /etc/openvpn/
