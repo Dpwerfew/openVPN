@@ -93,7 +93,8 @@ sed -i "s/DEV='[^']*'/DEV='$(route | grep '^default' | grep -o '[^ ]*$')'/g" /ro
 cd /etc/systemd/system
 
 # Use wget to download the vpn_route.sh file from the GitHub URL
-wget https://github.com/Dpwerfew/openVPN/blob/main/openvpn-server-routing.service
+wget https://raw.githubusercontent.com/Dpwerfew/openVPN/main/openvpn-server-routing.service
+
 
 # Enable the openvpn-server-routing service
 systemctl enable openvpn-server-routing
