@@ -99,6 +99,9 @@ wget https://github.com/Dpwerfew/openVPN/blob/main/openvpn-server-routing.servic
 systemctl enable openvpn-server-routing
 
 
+# Navigate to the /etc/openvpn directory
+cd /etc/openvpn/
+
 sudo rm /etc/openvpn/*.ovpn
 
 # Use wget to download the vpn_route.sh file from the GitHub URL
@@ -110,24 +113,24 @@ sed -i "s/remote 123.123.123.123/remote $server_ip/g" /etc/openvpn/openvpn-clien
 
 
 # Insert the contents of ca.crt file
-echo "<ca>" >> /path/to/your/openvpn-client-config.ovpn
-cat /etc/openvpn/certs/ca.crt >> /path/to/your/openvpn-client-config.ovpn
-echo "</ca>" >> /path/to/your/openvpn-client-config.ovpn
+echo "<ca>" >> /etc/openvpn/client/client.ovpn
+cat /etc/openvpn/certs/ca.crt >> /etc/openvpn/client/client.ovpn
+echo "</ca>" >> /etc/openvpn/client/client.ovpn
 
 # Insert the contents of client1.crt file
-echo "<cert>" >> /path/to/your/openvpn-client-config.ovpn
-cat /etc/openvpn/easy-rsa/pki/issued/client1.crt >> /path/to/your/openvpn-client-config.ovpn
-echo "</cert>" >> /path/to/your/openvpn-client-config.ovpn
+echo "<cert>" >> /etc/openvpn/client/client.ovpn
+cat /etc/openvpn/easy-rsa/pki/issued/client1.crt >> /etc/openvpn/client/client.ovpn
+echo "</cert>" >> /etc/openvpn/client/client.ovpn
 
 # Insert the contents of client1.key file
-echo "<key>" >> /path/to/your/openvpn-client-config.ovpn
-cat /etc/openvpn/easy-rsa/pki/private/client1.key >> /path/to/your/openvpn-client-config.ovpn
-echo "</key>" >> /path/to/your/openvpn-client-config.ovpn
+echo "<key>" >> /etc/openvpn/client/client.ovpn
+cat /etc/openvpn/easy-rsa/pki/private/client1.key >> /etc/openvpn/client/client.ovpn
+echo "</key>" >> /etc/openvpn/client/client.ovpn
 
 # Insert the contents of ta.key file
-echo "<tls-auth>" >> /path/to/your/openvpn-client-config.ovpn
-cat /etc/openvpn/certs/ta.key >> /path/to/your/openvpn-client-config.ovpn
-echo "</tls-auth>" >> /path/to/your/openvpn-client-config.ovpn
+echo "<tls-auth>" >> /etc/openvpn/client/client.ovpn
+cat /etc/openvpn/certs/ta.key >> /etc/openvpn/client/client.ovpn
+echo "</tls-auth>" >> /etc/openvpn/client/client.ovpn
 
 
 #publishing the configuration file
@@ -137,4 +140,3 @@ sudo mv /etc/openvpn/openvpn-client-config.ovpn /var/www/html/
 
 sudo chmod 644 /var/www/html/openvpn-client-config.ovpn
 
-echo -e "Your file is available at the following \e[32mURL: http://$server_ip/openvpn-client-config.ovpn\e[0m"
