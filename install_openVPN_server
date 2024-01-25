@@ -68,8 +68,8 @@ fi
 # Navigate to the /etc/openvpn directory
 cd /etc/openvpn
 
-# Use wget to download the server.conf file from the GitHub URL
-wget https://github.com/Dpwerfew/openVPN/raw/main/server.conf
+# Use wget to download the server.conf file from the GitHub URL with overwrite
+wget -O server.conf https://raw.githubusercontent.com/Dpwerfew/openVPN/main/server.conf
 
 # Start the OpenVPN service
 sudo systemctl start openvpn@server.service
@@ -83,8 +83,8 @@ mkdir -p /root/bin/
 # Navigate to the /etc/openvpn directory
 cd /root/bin
 
-# Use wget to download the vpn_route.sh file from the GitHub URL
-wget https://github.com/Dpwerfew/openVPN/raw/main/vpn_route.sh
+# Use wget to download the vpn_route.sh file from the GitHub URL with overwrite
+wget -O vpn_route.sh https://raw.githubusercontent.com/Dpwerfew/openVPN/main/vpn_route.sh
 
 # Set the network interface for internet access dynamically
 sed -i "s/DEV='[^']*'/DEV='$(route | grep '^default' | grep -o '[^ ]*$')'/g" /root/bin/vpn_route.sh
@@ -92,26 +92,21 @@ sed -i "s/DEV='[^']*'/DEV='$(route | grep '^default' | grep -o '[^ ]*$')'/g" /ro
 # Navigate to the /etc/openvpn directory
 cd /etc/systemd/system
 
-# Use wget to download the vpn_route.sh file from the GitHub URL
-wget https://raw.githubusercontent.com/Dpwerfew/openVPN/main/openvpn-server-routing.service
-
+# Use wget to download the openvpn-server-routing.service file from the GitHub URL with overwrite
+wget -O openvpn-server-routing.service https://raw.githubusercontent.com/Dpwerfew/openVPN/main/openvpn-server-routing.service
 
 # Enable the openvpn-server-routing service
 systemctl enable openvpn-server-routing
 
-
 # Navigate to the /etc/openvpn directory
 cd /etc/openvpn/
 
-sudo rm /etc/openvpn/*.ovpn
-
-# Use wget to download the vpn_route.sh file from the GitHub URL
-wget https://raw.githubusercontent.com/Dpwerfew/openVPN/main/openvpn-client-config.ovpn
+# Use wget to download the openvpn-client-config.ovpn file from the GitHub URL with overwrite
+wget -O openvpn-client-config.ovpn https://raw.githubusercontent.com/Dpwerfew/openVPN/main/openvpn-client-config.ovpn
 
 # Replace the IP address in the OpenVPN configuration file with the actual server IPv4 address
 server_ip=$(curl -4 ifconfig.co)  # Get the server's IPv4 address using curl
 sed -i "s/remote 123.123.123.123/remote $server_ip/g" /etc/openvpn/openvpn-client-config.ovpn
-
 
 # Insert the contents of ca.crt file
 echo "<ca>" >> /etc/openvpn/openvpn-client-config.ovpn
@@ -133,14 +128,20 @@ echo "<tls-auth>" >> /etc/openvpn/openvpn-client-config.ovpn
 cat /etc/openvpn/certs/ta.key >> /etc/openvpn/openvpn-client-config.ovpn
 echo "</tls-auth>" >> /etc/openvpn/openvpn-client-config.ovpn
 
-
-#publishing the configuration file
+# Create a directory for Apache to serve the configuration file
 sudo mkdir -p /var/www/html
 
+# Move the OpenVPN client config file to the Apache directory
 sudo mv /etc/openvpn/openvpn-client-config.ovpn /var/www/html/
 
-sudo chmod 644 /var/www/html/openvpn-client-config.ovpn
+# Change permissions of the config file to read-only
+sudo chmod 444 /var/www/html/openvpn-client-config.ovpn
 
+# Restart the OpenVPN service to apply changes
 sudo systemctl restart openvpn@server.service
 
-echo -e "Your file is available at the following \e[32mURL: http://$server_ip/openvpn-client-config.ovpn\e[0m"
+# Get the server's IPv4 address
+server_ip=$(curl -4 ifconfig.co)
+
+# Display the URL to the user
+echo -e "Your OpenVPN client configuration file is available at the following URL: http://$server_ip/openvpn-client-config.ovpn"
