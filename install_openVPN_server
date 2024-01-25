@@ -1,0 +1,140 @@
+#!/bin/bash
+
+# Update package lists
+sudo apt update
+
+# Install necessary packages with automatic "Y" confirmation
+sudo apt install -y openvpn easy-rsa net-tools
+
+# Install сurl 
+sudo apt install -y curl
+
+# Install apache2 
+sudo apt install apache2
+
+# Copy files to /etc/openvpn/
+sudo cp -R /usr/share/easy-rsa /etc/openvpn/
+cd /etc/openvpn/easy-rsa
+
+# Set EASYRSA environment variable to the current directory
+export EASYRSA=$(pwd)
+
+# Remove the .rnd file to avoid passphrase request
+rm -f .rnd
+
+# Initialize the public key infrastructure
+sudo ./easyrsa init-pki
+
+# Build the certificate authority (CA) without passphrase request
+sudo EASYRSA_BATCH=1 ./easyrsa build-ca nopass
+
+# Create a directory for keys and certificates
+mkdir /etc/openvpn/certs/
+
+# Copy the CA certificate to the new directory
+cp /etc/openvpn/easy-rsa/pki/ca.crt /etc/openvpn/certs/ca.crt
+
+# Generate a server key and certificate request with a default name (server)
+echo -e "Name_server\n\n\n\n\n\n\n\n\n\n" | sudo ./easyrsa gen-req server nopass
+
+# Sign the server certificate request with the CA key
+echo -e "yes" | sudo ./easyrsa sign-req server server
+
+# Generate a client key and certificate request with a default name (client1)
+echo -e "Name_client\n\n\n\n\n\n\n\n\n\n" | sudo ./easyrsa gen-req client1 nopass
+
+# Sign the client certificate request with the CA key
+echo -e "yes" | sudo ./easyrsa sign-req client client1
+
+
+# Copy the generated server certificate and key to /etc/openvpn/certs/
+sudo cp /etc/openvpn/easy-rsa/pki/issued/server.crt /etc/openvpn/certs/
+sudo cp /etc/openvpn/easy-rsa/pki/private/server.key /etc/openvpn/certs/
+
+# Generate the Diffie-Hellman parameters file
+openssl dhparam -out /etc/openvpn/certs/dh2048.pem 2048
+
+# Generate the HMAC key
+yes | openvpn --genkey --secret /etc/openvpn/certs/ta.key
+
+# Check the presence of required files in the /etc/openvpn/certs/ directory
+file_count=$(ls -1 /etc/openvpn/certs/ | wc -l)
+if [ "$file_count" -eq 5 ]; then
+    echo "All required files are present in the /etc/openvpn/certs/ directory."
+else
+    echo "Error: Not all required files are present in the /etc/openvpn/certs/ directory."
+fi
+
+# Navigate to the /etc/openvpn directory
+cd /etc/openvpn
+
+# Use wget to download the server.conf file from the GitHub URL
+wget https://github.com/Dpwerfew/openVPN/raw/main/server.conf
+
+# Start the OpenVPN service
+sudo systemctl start openvpn@server.service
+
+# Enable the OpenVPN service to start on boot
+sudo systemctl enable openvpn@server.service
+
+# Create the /root/bin/ directory if it doesn't exist
+mkdir -p /root/bin/
+
+# Navigate to the /etc/openvpn directory
+cd /root/bin
+
+# Use wget to download the vpn_route.sh file from the GitHub URL
+wget https://github.com/Dpwerfew/openVPN/raw/main/vpn_route.sh
+
+# Set the network interface for internet access dynamically
+sed -i "s/DEV='[^']*'/DEV='$(route | grep '^default' | grep -o '[^ ]*$')'/g" /root/bin/vpn_route.sh
+
+# Navigate to the /etc/openvpn directory
+cd /etc/systemd/system
+
+# Use wget to download the vpn_route.sh file from the GitHub URL
+wget https://github.com/Dpwerfew/openVPN/blob/main/openvpn-server-routing.service
+
+# Enable the openvpn-server-routing service
+systemctl enable openvpn-server-routing
+
+
+sudo rm /etc/openvpn/*.ovpn
+
+# Use wget to download the vpn_route.sh file from the GitHub URL
+wget https://raw.githubusercontent.com/Dpwerfew/openVPN/main/openvpn-client-config.ovpn
+
+# Replace the IP address in the OpenVPN configuration file with the actual server IPv4 address
+server_ip=$(curl -4 ifconfig.co)  # Get the server's IPv4 address using curl
+sed -i "s/remote 123.123.123.123/remote $server_ip/g" /etc/openvpn/openvpn-client-config.ovpn
+
+
+# Insert the contents of ca.crt file
+echo "<ca>" >> /path/to/your/openvpn-client-config.ovpn
+cat /etc/openvpn/certs/ca.crt >> /path/to/your/openvpn-client-config.ovpn
+echo "</ca>" >> /path/to/your/openvpn-client-config.ovpn
+
+# Insert the contents of client1.crt file
+echo "<cert>" >> /path/to/your/openvpn-client-config.ovpn
+cat /etc/openvpn/easy-rsa/pki/issued/client1.crt >> /path/to/your/openvpn-client-config.ovpn
+echo "</cert>" >> /path/to/your/openvpn-client-config.ovpn
+
+# Insert the contents of client1.key file
+echo "<key>" >> /path/to/your/openvpn-client-config.ovpn
+cat /etc/openvpn/easy-rsa/pki/private/client1.key >> /path/to/your/openvpn-client-config.ovpn
+echo "</key>" >> /path/to/your/openvpn-client-config.ovpn
+
+# Insert the contents of ta.key file
+echo "<tls-auth>" >> /path/to/your/openvpn-client-config.ovpn
+cat /etc/openvpn/certs/ta.key >> /path/to/your/openvpn-client-config.ovpn
+echo "</tls-auth>" >> /path/to/your/openvpn-client-config.ovpn
+
+
+#
+sudo mkdir -p /var/www/html
+
+sudo mv /etc/openvpn/openvpn-client-config.ovpn /var/www/html/
+
+sudo chmod 644 /var/www/html/openvpn-client-config.ovpn
+
+echo -e "Your file is available at the following \e[32mURL: http://$server_ip/openvpn-client-config.ovpn\e[0m"
