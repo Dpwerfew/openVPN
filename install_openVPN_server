@@ -130,7 +130,7 @@ cat /etc/openvpn/certs/ta.key >> /path/to/your/openvpn-client-config.ovpn
 echo "</tls-auth>" >> /path/to/your/openvpn-client-config.ovpn
 
 
-#
+#publishing the configuration file
 sudo mkdir -p /var/www/html
 
 sudo mv /etc/openvpn/openvpn-client-config.ovpn /var/www/html/
