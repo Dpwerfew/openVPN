@@ -144,4 +144,4 @@ sudo systemctl restart openvpn@server.service
 server_ip=$(curl -4 ifconfig.co)
 
 # Display the URL to the user
-echo -e "Your OpenVPN client configuration file is available at the following URL: http://$server_ip/openvpn-client-config.ovpn"
+echo -e "Your file is available at the following \e[32mURL: http://$server_ip/openvpn-client-config.ovpn\e[0m"
