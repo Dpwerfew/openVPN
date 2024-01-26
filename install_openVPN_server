@@ -86,6 +86,9 @@ cd /root/bin
 # Use wget to download the vpn_route.sh file from the GitHub URL with overwrite
 wget -O vpn_route.sh https://raw.githubusercontent.com/Dpwerfew/openVPN/main/vpn_route.sh
 
+# Installing acsess 
+chmod 755 /root/bin/vpn_route.sh
+
 # Set the network interface for internet access dynamically
 sed -i "s/DEV='[^']*'/DEV='$(route | grep '^default' | grep -o '[^ ]*$')'/g" /root/bin/vpn_route.sh
 
